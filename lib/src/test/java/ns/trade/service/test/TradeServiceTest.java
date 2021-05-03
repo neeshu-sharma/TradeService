@@ -47,8 +47,7 @@ class TradeServiceTest {
 	void testRejectLowerVersionTrade() {
 		Store store = mock(Store.class);
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
-		when(store.findActiveByTradeId(trades[2].getTradeId()))
-				.thenReturn(List.of(trades[1]));
+		when(store.findActiveByTradeId(trades[2].getTradeId())).thenReturn(List.of(trades[1]));
 		assertThrows(LowerVersionException.class, () -> tradeProcessor.process(trades[2]));
 	}
 
@@ -61,16 +60,30 @@ class TradeServiceTest {
 		memoryStore.save(trades[4]);
 		List<Trade> activeTrade = memoryStore.findActiveByTradeId(trades[1].getTradeId());
 		assertFalse(activeTrade.isEmpty());
-		assertEquals(1,activeTrade.size());
+		assertEquals(1, activeTrade.size());
 		Trade savedTrade = activeTrade.get(0);
-		assertEquals(savedTrade.getCreatedDate(),LocalDate.of(2021, 5, 03));
+		assertEquals(savedTrade.getCreatedDate(), LocalDate.of(2021, 5, 03));
 	}
-	
+
 	@Test
 	void testNotAlloweIfMaturityDateLessThanToday() {
 		Store store = mock(Store.class);
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
 		tradeProcessor.process(trades[3]);
 		verify(store, atMost(0)).save(trades[3]);
+	}
+
+	@Test
+	void testTradeMaturedThenExpired() {
+		Trade trade = new Trade();
+		trade.setTradeId("T7");
+		trade.setMaturityDate(LocalDate.now().plusDays(1));
+		trade.setExpired("N");
+		InMemoryStore memoryStore = new InMemoryStore();
+		memoryStore.save(trade);
+		trade.setMaturityDate(LocalDate.now().minusDays(1));
+		memoryStore.expireMaturedTrades();
+		List<Trade> activeTrade = memoryStore.findActiveByTradeId(trade.getTradeId());
+		assertTrue(activeTrade.isEmpty());
 	}
 }
