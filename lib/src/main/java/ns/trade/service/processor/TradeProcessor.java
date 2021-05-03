@@ -1,5 +1,6 @@
 package ns.trade.service.processor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import ns.trade.service.dao.Store;
@@ -15,9 +16,14 @@ public class TradeProcessor {
 	}
 
 	public void process(Trade trade) {
+		boolean matDateLessToday = trade.getMaturityDate().isBefore(LocalDate.now());
+		if (matDateLessToday) {
+			return;
+		}
 		List<Trade> activeTrade = store.findActiveByTradeId(trade.getTradeId());
-		activeTrade.stream().filter(at -> at.getVersion() > trade.getVersion())
-		.findFirst().ifPresent(at -> throwLowerVersionException(trade, at));
+		activeTrade.stream().filter(at -> at.getVersion() > trade.getVersion()).findFirst()
+				.ifPresent(at -> throwLowerVersionException(trade, at));
+
 		store.save(trade);
 	}
 
@@ -26,4 +32,5 @@ public class TradeProcessor {
 				trade.getVersion());
 		throw new LowerVersionException(message);
 	}
+
 }
