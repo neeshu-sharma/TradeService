@@ -9,3 +9,4 @@
 
 rootProject.name = 'TradeService'
 include('lib')
+include('executor')

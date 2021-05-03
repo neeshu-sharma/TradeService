@@ -43,4 +43,9 @@ public class InMemoryStore implements Store {
 		System.out.println("Marked Matured Trades Expired");
 	}
 
+	@Override
+	public List<Trade> getAll() {
+		return trades.values().stream().flatMap(List::stream).collect(Collectors.toList());
+	}
+
 }

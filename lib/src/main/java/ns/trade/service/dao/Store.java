@@ -9,5 +9,6 @@ public interface Store {
 	List<Trade> findActiveByTradeId(String tradeId);
 	void save(Trade trade);
 	void expireMaturedTrades();
+	List<Trade> getAll();
 
 }

@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+subprojects{
+	repositories {
+	    jcenter()
+	}
+	test {
+	  useJUnitPlatform()
+	  jvmArgs '--add-modules=jdk.incubator.foreign'
+	}
+}
