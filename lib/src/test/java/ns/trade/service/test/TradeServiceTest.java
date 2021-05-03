@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,6 +63,14 @@ class TradeServiceTest {
 		assertFalse(activeTrade.isEmpty());
 		assertEquals(1,activeTrade.size());
 		Trade savedTrade = activeTrade.get(0);
-		assertEquals(savedTrade.getCreatedDate(),LocalDate.of(2021, 5, 02));
+		assertEquals(savedTrade.getCreatedDate(),LocalDate.of(2021, 5, 03));
+	}
+	
+	@Test
+	void testNotAlloweIfMaturityDateLessThanToday() {
+		Store store = mock(Store.class);
+		TradeProcessor tradeProcessor = new TradeProcessor(store);
+		tradeProcessor.process(trades[3]);
+		verify(store, atMost(0)).save(trades[3]);
 	}
 }
