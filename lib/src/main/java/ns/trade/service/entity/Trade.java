@@ -13,7 +13,7 @@ public class Trade {
 	@JsonDeserialize(using = CustomLocalDateDeserializer.class)  
 	private LocalDate maturityDate;
 	@JsonDeserialize(using = CustomLocalDateDeserializer.class)  
-	private LocalDate createdDate;
+	private LocalDate createdDate =LocalDate.now();
 	private String expired;
 
 	public String getTradeId() {

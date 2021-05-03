@@ -1,10 +1,11 @@
-package TradeService;
+package ns.trade.service.test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ns.trade.service.dao.InMemoryStore;
 import ns.trade.service.dao.Store;
 import ns.trade.service.entity.Trade;
 import ns.trade.service.exception.LowerVersionException;
@@ -25,7 +27,7 @@ class TradeServiceTest {
 	@BeforeAll
 	static void init() throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		String tradeJson = "trades.json";
+		String tradeJson = "tradeDetails.json";
 		ClassLoader classLoader = TradeServiceTest.class.getClassLoader();
 		File file = new File(classLoader.getResource(tradeJson).getFile());
 		trades = objectMapper.readValue(file, Trade[].class);
@@ -38,15 +40,28 @@ class TradeServiceTest {
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
 		tradeProcessor.process(trades[0]);
 		verify(store).save(trades[0]);
+		assertNotNull(trades[0].getCreatedDate());
 	}
 
 	@Test
 	void testRejectLowerVersionTrade() {
 		Store store = mock(Store.class);
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
-		when(store.findActiveByTradeIdAndVersionLessThan(trades[2].getTradeId(), trades[2].getVersion()))
+		when(store.findActiveByTradeIdAndVersionGreaterThan(trades[2].getTradeId(), trades[2].getVersion()))
 				.thenReturn(Optional.of(trades[1]));
 
 		assertThrows(LowerVersionException.class, () -> tradeProcessor.process(trades[2]));
+	}
+
+	@Test
+	void testOverrideSameVersionTrade() {
+		assertEquals(trades[1].getTradeId(), trades[4].getTradeId());
+		assertEquals(trades[1].getVersion(), trades[4].getVersion());
+		InMemoryStore memoryStore = new InMemoryStore();
+		memoryStore.save(trades[1]);
+		memoryStore.save(trades[4]);
+		Optional<Trade> activeTrade = memoryStore.findActiveByTradeIdAndVersionGreaterThan(trades[4].getTradeId(), trades[4].getVersion());
+		assertTrue(activeTrade.isPresent());
+		activeTrade.ifPresent(at -> assertEquals(at.getCreatedDate(), LocalDate.of(2021, 5, 22)));
 	}
 }

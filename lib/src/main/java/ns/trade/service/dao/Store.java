@@ -6,7 +6,7 @@ import ns.trade.service.entity.Trade;
 
 public interface Store {
 
-	Optional<Trade> findActiveByTradeIdAndVersionLessThan(String tradeId,int version);
+	Optional<Trade> findActiveByTradeIdAndVersionGreaterThan(String tradeId,int version);
 	void save(Trade trade);
 
 

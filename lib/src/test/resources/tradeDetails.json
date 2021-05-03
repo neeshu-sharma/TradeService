@@ -31,5 +31,13 @@
 		"bookId": "B2",
 		"maturityDate": "20/05/2014",
 		"expired": "Y"
+	},
+	{
+		"tradeId": "T2",
+		"version": 2,
+		"counterPartyId": "CP-2",
+		"bookId": "B1",
+		"maturityDate": "22/05/2021",
+		"expired": "N"
 	}
 ]

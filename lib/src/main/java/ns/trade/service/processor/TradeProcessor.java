@@ -15,7 +15,7 @@ public class TradeProcessor {
 	}
 
 	public void process(Trade trade) {
-		Optional<Trade> activeTrade = store.findActiveByTradeIdAndVersionLessThan(trade.getTradeId(),trade.getVersion());
+		Optional<Trade> activeTrade = store.findActiveByTradeIdAndVersionGreaterThan(trade.getTradeId(),trade.getVersion());
 		activeTrade.ifPresent(at -> throwLowerVersionException(trade, at));
 		store.save(trade);
 	}
