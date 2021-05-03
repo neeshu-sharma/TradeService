@@ -32,10 +32,10 @@ class TradeServiceTest {
 
 	@Test
 	void testStoreTrade() {
-		TradeProcessor tradeProcessor = new TradeProcessor();
-		tradeProcessor.process(trades[0]);
 		Store store = mock(Store.class);
-		Mockito.verify(store).store(trades[0]);
+		TradeProcessor tradeProcessor = new TradeProcessor(store);
+		tradeProcessor.process(trades[0]);
+		Mockito.verify(store).save(trades[0]);
 	}
 
 }

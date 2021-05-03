@@ -4,6 +4,6 @@ import ns.trade.service.entity.Trade;
 
 public interface Store {
 
-	void store(Trade trade);
+	void save(Trade trade);
 
 }
