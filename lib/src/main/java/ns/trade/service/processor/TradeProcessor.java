@@ -1,6 +1,6 @@
 package ns.trade.service.processor;
 
-import java.util.Optional;
+import java.util.List;
 
 import ns.trade.service.dao.Store;
 import ns.trade.service.entity.Trade;
@@ -15,8 +15,9 @@ public class TradeProcessor {
 	}
 
 	public void process(Trade trade) {
-		Optional<Trade> activeTrade = store.findActiveByTradeIdAndVersionGreaterThan(trade.getTradeId(),trade.getVersion());
-		activeTrade.ifPresent(at -> throwLowerVersionException(trade, at));
+		List<Trade> activeTrade = store.findActiveByTradeId(trade.getTradeId());
+		activeTrade.stream().filter(at -> at.getVersion() > trade.getVersion())
+		.findFirst().ifPresent(at -> throwLowerVersionException(trade, at));
 		store.save(trade);
 	}
 

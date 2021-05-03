@@ -1,6 +1,7 @@
 package ns.trade.service.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -70,6 +71,21 @@ public class Trade {
 
 	public void setExpired(String expired) {
 		this.expired = expired;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(tradeId, version);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Trade))
+			return false;
+		Trade other = (Trade) obj;
+		return Objects.equals(tradeId, other.tradeId) && version == other.version;
 	}
 
 }

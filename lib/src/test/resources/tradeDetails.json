@@ -38,6 +38,7 @@
 		"counterPartyId": "CP-2",
 		"bookId": "B1",
 		"maturityDate": "22/05/2021",
+		"createdDate": "03/05/2021",
 		"expired": "N"
 	}
 ]

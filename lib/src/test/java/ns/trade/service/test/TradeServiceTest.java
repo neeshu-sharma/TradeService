@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -47,9 +48,8 @@ class TradeServiceTest {
 	void testRejectLowerVersionTrade() {
 		Store store = mock(Store.class);
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
-		when(store.findActiveByTradeIdAndVersionGreaterThan(trades[2].getTradeId(), trades[2].getVersion()))
-				.thenReturn(Optional.of(trades[1]));
-
+		when(store.findActiveByTradeId(trades[2].getTradeId()))
+				.thenReturn(List.of(trades[1]));
 		assertThrows(LowerVersionException.class, () -> tradeProcessor.process(trades[2]));
 	}
 
@@ -60,8 +60,10 @@ class TradeServiceTest {
 		InMemoryStore memoryStore = new InMemoryStore();
 		memoryStore.save(trades[1]);
 		memoryStore.save(trades[4]);
-		Optional<Trade> activeTrade = memoryStore.findActiveByTradeIdAndVersionGreaterThan(trades[4].getTradeId(), trades[4].getVersion());
-		assertTrue(activeTrade.isPresent());
-		activeTrade.ifPresent(at -> assertEquals(at.getCreatedDate(), LocalDate.of(2021, 5, 22)));
+		List<Trade> activeTrade = memoryStore.findActiveByTradeId(trades[1].getTradeId());
+		assertFalse(activeTrade.isEmpty());
+		assertEquals(1,activeTrade.size());
+		Trade savedTrade = activeTrade.get(0);
+		assertEquals(savedTrade.getCreatedDate(),LocalDate.of(2021, 5, 02));
 	}
 }

@@ -1,12 +1,12 @@
 package ns.trade.service.dao;
 
-import java.util.Optional;
+import java.util.List;
 
 import ns.trade.service.entity.Trade;
 
 public interface Store {
 
-	Optional<Trade> findActiveByTradeIdAndVersionGreaterThan(String tradeId,int version);
+	List<Trade> findActiveByTradeId(String tradeId);
 	void save(Trade trade);
 
 
