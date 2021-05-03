@@ -1,11 +1,11 @@
 package TradeService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,8 +44,9 @@ class TradeServiceTest {
 	void testRejectLowerVersionTrade() {
 		Store store = mock(Store.class);
 		TradeProcessor tradeProcessor = new TradeProcessor(store);
-			tradeProcessor.process(trades[0]);
-			tradeProcessor.process(trades[1]);
-			assertThrows(LowerVersionException.class, () -> tradeProcessor.process(trades[2]));
+		when(store.findActiveByTradeIdAndVersionLessThan(trades[2].getTradeId(), trades[2].getVersion()))
+				.thenReturn(Optional.of(trades[1]));
+
+		assertThrows(LowerVersionException.class, () -> tradeProcessor.process(trades[2]));
 	}
 }
