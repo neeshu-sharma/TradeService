@@ -34,7 +34,13 @@ public class InMemoryStore implements Store {
 
 	@Override
 	public void expireMaturedTrades() {
-		
+		System.out.println("Marking Matured Trades Expired");
+		synchronized (trades) {
+			trades.values().stream().flatMap(List::stream).filter(trade -> ("N").equals(trade.getExpired()))
+					.filter(trade -> LocalDate.now().isAfter(trade.getMaturityDate()))
+					.forEach(trade -> trade.setExpired("Y"));
+		}
+		System.out.println("Marked Matured Trades Expired");
 	}
 
 }
